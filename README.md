@@ -20,6 +20,7 @@ Own modifications
 
 The modifications are included in the following branches:
 * v2.7
+
 (master will not be modified)
 
 Branches and releases
