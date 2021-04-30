@@ -287,6 +287,14 @@ public:
 
 /// Cite a paper see PlumedMain::cite
   std::string cite(const std::string&s);
+
+/// Check if the name is that in the argument
+  bool nameIs(std::string);
+
+/// We need these only for the action QMcharge,
+/// so how about making it virtual here?
+  virtual void setQMq(void *val);
+  virtual void setQMdqdx(void *val);
 };
 
 /////////////////////

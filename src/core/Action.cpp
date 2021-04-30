@@ -267,6 +267,21 @@ std::string Action::cite(const std::string&s) {
   return plumed.cite(s);
 }
 
+// Tomas Kubar -- to check if it is QMcharge
+bool Action::nameIs(std::string text) {
+  return (name == text);
+}
+
+// Tomas Kubar -- these only need to have real content for Colvar::QMcharge
+//                (and may remain empty otherwise),
+//                but I have not come up with any better way
+void Action::setQMq(void *val){
+  return;
+}
+void Action::setQMdqdx(void *val){
+  return;
+}
+
 /// Check if action should be updated.
 bool Action::checkUpdate()const {
   double t=getTime();

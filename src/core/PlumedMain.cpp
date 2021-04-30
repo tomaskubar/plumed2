@@ -201,6 +201,22 @@ void PlumedMain::cmd(const std::string & word,void*val) {
         CHECK_INIT(initialized,word);
         atoms.setCharges(val);
         break;
+      case cmd_setQMCharges:
+        CHECK_INIT(initialized,word);
+        for(ActionSet::iterator p=actionSet.begin(); p!=actionSet.end(); ++p) {
+          if ((*p)->nameIs("QMCHARGE")) {
+            (*p)->setQMq(val);
+          }
+        }
+        break;
+      case cmd_setQMChargeGradients:
+        CHECK_INIT(initialized,word);
+        for(ActionSet::iterator p=actionSet.begin(); p!=actionSet.end(); ++p) {
+          if ((*p)->nameIs("QMCHARGE")) {
+            (*p)->setQMdqdx(val);
+          }
+        }
+        break;
       case cmd_setPositionsX:
         CHECK_INIT(initialized,word);
         atoms.setPositions(val,0);
