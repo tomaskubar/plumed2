@@ -17,10 +17,10 @@ Consider the charge of an atom that is being considered as a QM atom in a QM/MM 
 
 \par Examples
 In the following, the QM zone in the simulation consists of atoms 1 through 14 as well as 29,
-and the charge of atom #2 is considered for the collective variable:
-the atoms from 1-10 and print it every 5 steps
+atoms nos. 35 through 75 are considered as MM atoms affecting the QM charges,
+and the charge of atom #2 constitutes the collective variable:
 \verbatim
-q: QMCHARGE ATOM=2 QMATOMS=1-14,29
+q: QMCHARGE ATOM=2 QMATOMS=1-14,29 MMATOMS=35-75
 \endverbatim
 
 \attention
@@ -32,9 +32,12 @@ Attention!
 class QMcharge : public Colvar {
   unsigned iQMatom;
   int QMnr;
+  int MMnr;
   vector<int> QMix;
   vector<double> QMq;
   vector<double> QMdqdx;
+  vector<int> MMix;
+  vector<double> QMdqdxMM;
 
 public:
   explicit QMcharge(const ActionOptions&);
@@ -42,14 +45,16 @@ public:
   static void registerKeywords(Keywords& keys);
   void setQMq(void *val);
   void setQMdqdx(void *val);
+  void setQMdqdxMM(void *val);
 };
 
 PLUMED_REGISTER_ACTION(QMcharge,"QMCHARGE")
 
 void QMcharge::registerKeywords(Keywords& keys) {
   Colvar::registerKeywords(keys);
-  keys.add("atoms","ATOM","the atom for which the QM charges is being considered");
+  keys.add("atoms","ATOM","the atom for which the QM charge is being considered");
   keys.add("atoms","QMATOMS","all of the QM atoms -- cumbersome but important!");
+  keys.add("atoms","MMATOMS","the MM atoms considered to be affecting the QM charges -- cumbersome but important!");
 }
 
 QMcharge::QMcharge(const ActionOptions&ao):
@@ -78,7 +83,22 @@ QMcharge::QMcharge(const ActionOptions&ao):
   QMq.resize(QMnr);
   QMdqdx.resize(3*QMnr);
 
+  // The MM atoms that are considered to affect the QM charges.
+  vector<AtomNumber> MMatoms;
+  parseAtomList("MMATOMS", MMatoms);
+  MMnr = MMatoms.size();
+  MMix.resize(MMnr);
+  for (int i=0; i<MMnr; i++) {
+    MMix[i] = MMatoms[i].index();
+  }
+  QMdqdxMM.resize(3*MMnr);
+
+  // it seems that all of the atoms (QM+MM) need to be requested at the same time,
+  //   so we first append MMatoms to QMatoms, and then request the whole vector
+  QMatoms.insert(QMatoms.end(), MMatoms.begin(), MMatoms.end());
   requestAtoms(QMatoms);
+  // this will then be unnecessary
+//requestAtoms(MMatoms);
 
   checkRead();
 }
@@ -92,6 +112,13 @@ void QMcharge::calculate() {
     temp_dvec[1] = QMdqdx[3*i+1];
     temp_dvec[2] = QMdqdx[3*i+2];
     setAtomsDerivatives(i, temp_dvec);
+  }
+  for (int i=0; i<MMnr; i++) {
+    Vector temp_dvec;
+    temp_dvec[0] = QMdqdxMM[3*i  ];
+    temp_dvec[1] = QMdqdxMM[3*i+1];
+    temp_dvec[2] = QMdqdxMM[3*i+2];
+    setAtomsDerivatives(QMnr + i, temp_dvec);
   }
   setValue(QMq[iQMatom]);
 }
@@ -116,6 +143,16 @@ void QMcharge::setQMdqdx(void *val) {
     QMdqdx[3*i  ] = source[iQMatom * QMnr + i][0];
     QMdqdx[3*i+1] = source[iQMatom * QMnr + i][1];
     QMdqdx[3*i+2] = source[iQMatom * QMnr + i][2];
+  }
+}
+
+void QMcharge::setQMdqdxMM(void *val) {
+  // fill it with content
+  dvec *source = (dvec *) val;
+  for (int i=0; i<MMnr; i++) {
+    QMdqdxMM[3*i  ] = source[iQMatom * MMnr + i][0];
+    QMdqdxMM[3*i+1] = source[iQMatom * MMnr + i][1];
+    QMdqdxMM[3*i+2] = source[iQMatom * MMnr + i][2];
   }
 }
 

@@ -295,6 +295,7 @@ public:
 /// so how about making it virtual here?
   virtual void setQMq(void *val);
   virtual void setQMdqdx(void *val);
+  virtual void setQMdqdxMM(void *val);
 };
 
 /////////////////////

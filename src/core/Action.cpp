@@ -281,6 +281,9 @@ void Action::setQMq(void *val){
 void Action::setQMdqdx(void *val){
   return;
 }
+void Action::setQMdqdxMM(void *val){
+  return;
+}
 
 /// Check if action should be updated.
 bool Action::checkUpdate()const {
