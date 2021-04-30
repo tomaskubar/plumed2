@@ -12,6 +12,16 @@
 [![FreeBSD port](https://repology.org/badge/version-for-repo/freebsd/plumed.svg)](https://repology.org/project/plumed/versions)
 [![Twitter Follow](https://img.shields.io/twitter/follow/plumed_org.svg?style=social&label=Follow)](https://twitter.com/plumed_org)
 
+Own modifications
+-----------------
+
+* QM atomic charges as colvar
+* modified center of excess charge as colvar (mCEC, Koenig 2006)
+
+The modifications are included in the following branches:
+* v2.7
+(master will not be modified)
+
 Branches and releases
 ---------------------
 
